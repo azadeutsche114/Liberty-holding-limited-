@@ -1,0 +1,273 @@
+import keras
+from keras.models import Sequential
+from keras.layers import Activation
+from keras.layers.core import Dense
+from keras.optimizers import Adam
+from keras.metrics import categorical_crossentropy
+from keras.preprocessing.image import ImageDataGenerator
+from keras.layers.normalization import BatchNormalization
+from keras.layers.convolutional import Conv2D
+
+import tensorflow
+from tensorflow import keras
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Activation, Dense, BatchNormalization, Conv2D
+from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.metrics import categorical_crossentropy
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
+
+
+from numpy.random import seed
+seed(1)
+
+import tensorflow as tf
+tf.random.set_seed(2)
+
+from tensorflow.keras.models import sequential
+from tensorflow.keras.layers import Dense
+
+from sklearn.model_selection import train_test_split
+
+
+from functions import *
+
+
+data_2class, targets_2class, colors_2class = load_data(total_data_points=600, nr_clusters=2)
+
+plot_data(data_2class, colors_2class)
+
+
+train_x, test_x, train_y, test_y = train_test_split(data_2class,
+                                                   targets_2class,
+                                                   test_size = 0.1,
+                                                   random_state=42)
+
+
+perc_model = tf.keras.models.sequential([Dense(1,
+                                              input_shape=(2,),
+                                              activation=‘sigmoid')])
+
+perc_model.compile(loss='binary_crossentropy',
+                   optimiser = 'SGD',
+                   metrics = [‘accuracy'])
+
+perc_model_hist = perc_model.fit(train_x,
+                                 train_y,
+                                 epochs=1,
+                                 batch_size=1,
+                                 validation_split=0.1)
+
+
+
+data_circle, targets_circle, colors_circle = load_circular_data(1000)
+
+plot_circle_data(data_circle, targets_circle, colors_circle)
+
+
+
+plot_transformed_data(transform_polar(data_circle), colors_circle)
+
+
+data_circle_train, data_circle_test, targets_circle_train, targets_circle_test = train_test_split(data_circle,
+                                                                                                  targets_circle,
+                                                                                                  test_size=0.1,
+                                                                                                  random_state=42)
+
+
+circle_model = tf.keras.models.sequential([
+    Dense(12, input_shape=(2,), activation = 'relu'),
+    Dense(6, activation='relu'),
+    Dense(1, activation=‘sigmoid')])
+
+
+circle_model.compile(loss='binary_crossentropy',
+                     optimiser='sgd',
+                     metrics =[‘accuracy'])
+
+
+circle_model_hist=circle_model.fit(data_circle_train,
+                                    targets_circle_train,
+                                    epochs =15,
+                                    batch_size=2,
+                                    validation_split=0.1)
+
+
+plot_decision_boundary_complex(data_circle,
+                              100,
+                              circle_model,
+                              colors_circle,
+                              cmap_range=0.5,
+                              s=20,
+                              alpha=0.8)
+
+predict_y=circle_model.predict(data_circle_test)
+print(predict_y[0:5])
+
+test_evaluation(predict_y, targets_circle_test)
+
+circle_model_hist.history.keys()
+
+plot_loss(circle_model_hist)
+
+
+
+
+
+
+
+
+
+
+from numpy.random import seed
+seed(1)
+import tensorflow as tf
+tf.random.set_seed(2)
+
+from tensorflow.keras.models import sequential
+from tensorflow.keras.layers import Dense
+from tensorflow.keras import initializers
+
+
+from sklearn.model_selection import train_test_split
+
+from functions import *
+
+
+
+
+days, revenue =  load_linear_data(270)
+x_train, y_train, x_test, y_test = train_test_split(days, 
+                                                    revenue,
+                                                    random_state=42,
+                                                    test_Size = 0.1)
+
+plot_linear_data(days, revenue)
+
+
+
+
+first_model = Sequential(Dense(1, 
+                              input_shape=(1,),
+                              activation=‘linear'))
+
+
+
+first_model.compile(loss='mean_squared_error',
+                    optimiser='sgd',
+                    metrics = [‘mean_absolute_percentage_error'])
+
+
+
+first_model_hist=first_model.fit(days,
+                                 revenue,
+                                 epochs=7,
+                                 batch_size=100,
+                                 validation_split=0.1)
+
+
+plot.weights()
+
+
+reg_model = Sequential(Dense(1,
+                             use_bias=True,
+                             input_shape=(1,),
+                             activation='Linear',
+                             kernel_initializer=initializers.RandomNormal(stddev=0.01),
+                             bias_initializer=initializers.Zeros()))
+
+
+
+
+reg_model.compile(loss='mean_squared_error',
+                  optimizer='adam',
+                  metrics = [‘mean_absolute_percentage_error'])
+
+
+reg_model_hist = reg_model.fit(days,
+                               revenue,
+                               epochs=6,
+                               batch_size=2,
+                               validation_split=0.1,
+                               verbose=1)
+
+
+
+create_forecast(reg_model,
+                400,
+                days,
+                revenue)
+
+
+x_data, Y_data = load_pricing_data()
+plot_pricing_data(x_data, Y_data)
+
+
+
+model = sequential(Dense(1,
+                         use_bias=True,
+                         input_shape=(1,)
+                         activation='linear',
+                         kernel_initializer=initializers.RandomNormal(stddev=0.01),
+                         bias_initializer=initializer.Zeros()))
+
+
+model.compile(optimizer=tf.keras.optimisers.Adam(learning_rate=1),
+              loss='mean_squared_error',
+              metrics=[‘mean_absolute_percentage_error'])
+
+
+
+model.hist = model.fit(x_data,
+                       Y_data,
+                       epochs=20,
+                       batch_size=2,
+                       validation_split=0.1)
+
+
+create_prediction(model, x_data, Y_data)
+
+
+
+
+
+
+
+
+
+
+
+
+
+komplex_model = Sequential([Dense(256,
+                                  activation='relu',
+                                  kernel_initializer=initializers.RandomNormal(stddev=0.01),
+                                  bias_initializer=initializers.Zeros()),
+                            Dense(256, 
+                                  activation='relu',
+                                  kernel_initializer=initializers.RandomNormal(stddev=0.01),
+                                  bias_initializer=initializers.Zeros()),
+                            Dense(64, 
+                                  activation='relu',
+                                  kernel_initializer=initializers.RandomNormal(stddev=0.01),
+                                  bias_initializer=initializers.Zeros()),
+                            Dense(64, 
+                                  activation='relu',
+                                  kernel_initializer=initializers.RandomNormal(stddev=0.01),
+                                  bias_initializer=initializers.Constant(0.1)),
+                            Dense(1, 
+                                  activation=‘linear')])
+
+
+x_data_rescale = rescale(x_data, mode = 'mini')
+Y_data_rescale = rescale(Y_data, mode = 'mini')
+
+plt.scatter(x_data_rescale, Y_data_rescale):
+
+
+
+komplex_model.compile(loss='mean_squared_error',
+                      optimiser=tf.keras.optimizers.Adam(lr=0.001)
+                      metrics=[‘mean_absolute_error'])
+
+
+x_data_rescale, Y_data_rescale = shuffle(x_data_rescale, Y_)
